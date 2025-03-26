@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(m_ipWidget);
 
     readSettings();
+
+    connect(m_ipWidget, &IPWidget::statusChanged, this, &MainWindow::statusBarChanged);
 }
 
 MainWindow::~MainWindow()
@@ -31,6 +33,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     writeSettings();
     event->accept();
+}
+
+void MainWindow::statusBarChanged(const QString &str)
+{
+    ui->statusbar->showMessage(str);
 }
 
 void MainWindow::writeSettings()

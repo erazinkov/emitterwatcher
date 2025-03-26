@@ -21,6 +21,9 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+public slots:
+    void statusBarChanged(const QString &);
+
 private:
     Ui::MainWindow *ui;
 
