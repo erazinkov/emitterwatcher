@@ -30,7 +30,8 @@ signals:
 
 private:
     QGridLayout *m_gridLayout;
-    QLineEdit *m_lineEdit;
+    QLineEdit *m_ipLineEdit;
+    QLineEdit *m_commandLineEdit;
     QLabel *m_label;
     QProcess *m_process;
 

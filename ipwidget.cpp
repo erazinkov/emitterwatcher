@@ -11,7 +11,8 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
 {
     m_gridLayout = new QGridLayout;
     this->setLayout(m_gridLayout);
-    m_lineEdit = new QLineEdit(this);
+    m_ipLineEdit = new QLineEdit(this);
+    m_commandLineEdit = new QLineEdit(this);
     m_label = new QLabel(this);
     m_button = new QPushButton("Start", this);
 
@@ -30,12 +31,13 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
 
     m_process = new QProcess;
     m_label->setText("IP-address:");
-    m_lineEdit->setAlignment(Qt::AlignCenter);
-    m_lineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    m_ipLineEdit->setAlignment(Qt::AlignCenter);
+    m_ipLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     m_gridLayout->addWidget(m_label, 1, 1);
-    m_gridLayout->addWidget(m_lineEdit, 1, 2);
+    m_gridLayout->addWidget(m_ipLineEdit, 1, 2);
     m_gridLayout->addWidget(m_button, 1, 3);
     m_gridLayout->addWidget(m_labelTime, 1, 4);
+    m_gridLayout->addWidget(m_commandLineEdit, 2, 1, 1, 2);
     m_gridLayout->setAlignment(Qt::AlignCenter);
 
     QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
@@ -44,10 +46,14 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
                          + "\\." + ipRange
                          + "\\." + ipRange + "$");
     QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipRegex, this);
-    m_lineEdit->setValidator(ipValidator);
+    m_ipLineEdit->setValidator(ipValidator);
 
-    connect(m_lineEdit, &QLineEdit::editingFinished, this, [&](){
-//        m_process->start("ping", QStringList() << "-c" << "1" << QString(m_lineEdit->text()));
+    connect(m_commandLineEdit, &QLineEdit::editingFinished, this, [&](){
+        qInfo() << m_commandLineEdit->text().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+    });
+
+    connect(m_ipLineEdit, &QLineEdit::editingFinished, this, [&](){
+//        m_process->start("ping", QStringList() << "-c" << "1" << QString(m_ipLineEdit->text()));
     });
     connect(m_process, &QProcess::started, this, [&](){
         QString str{"Connecting..."};
@@ -58,7 +64,7 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
         ba = ba.simplified();
         ba = ba.trimmed();
         auto isUnreachable{ba.contains("Destination Host Unreachable")};
-        auto isPacketLoss{!ba.contains("0% packet loss")};
+        auto isPacketLoss{ba.contains("100% packet loss")};
         QString str{isUnreachable || isPacketLoss ? "Error" : "Ok"};
         emit(statusChanged(str));
         qInfo() << ba;
@@ -75,7 +81,7 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_timer, &QTimer::timeout, this, [&](){
         if (m_process->state() != QProcess::Running) {
-            m_process->start("ping", QStringList() << "-c" << "1" << QString(m_lineEdit->text()));
+            m_process->start("ping", QStringList() << "-c" << "1" << QString(m_ipLineEdit->text()));
         }
     });
 
@@ -90,12 +96,14 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
     connect(m_button, &QPushButton::clicked, this, [&](){
         if (m_timer->isActive()) {
             m_timer->stop();
-            m_lineEdit->setDisabled(false);
+            m_ipLineEdit->setDisabled(false);
             m_button->setText("Start");
+            QString str{"Unknown"};
+            emit(statusChanged(str));
             return;
         }
         m_timer->start();
-        m_lineEdit->setDisabled(true);
+        m_ipLineEdit->setDisabled(true);
         m_button->setText("Stop");
     });
 
@@ -113,10 +121,10 @@ IPWidget::IPWidget(QWidget *parent) : QWidget(parent)
 
 QString IPWidget::ip() const
 {
-    return m_lineEdit->text();
+    return m_ipLineEdit->text();
 }
 
 void IPWidget::setIp(QString ip)
 {
-    m_lineEdit->setText(ip);
+    m_ipLineEdit->setText(ip);
 }
