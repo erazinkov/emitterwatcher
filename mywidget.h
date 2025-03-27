@@ -24,6 +24,12 @@ public:
     QString request() const;
     void setRequest(QString ip);
 
+    QString requestTimeout() const;
+    void setRequestTimeout(QString ip);
+
+    QString response() const;
+    void setResponse(QString ip);
+
 private:
     QGridLayout *m_gridLayout;
 
@@ -31,12 +37,18 @@ private:
     QLineEdit *m_requestLineEdit;
     QLabel *m_requestLabel;
 
+    QString m_requestTimeout;
+    QLineEdit *m_requestTimeoutLineEdit;
+    QLabel *m_requestTimeoutLabel;
+
+
     QString m_response;
     QLineEdit *m_responseLineEdit;
     QLabel *m_responseLabel;
 
 
     QProcess *m_process;
+    QProcess *m_processTimeout;
 
     QTimer *m_timer;
     QPushButton *m_button;
