@@ -16,7 +16,8 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
     m_responseLineEdit = new QLineEdit(this);
     m_responseLabel = new QLabel(this);
 
-    m_button = new QPushButton("Start", this);
+    m_checkBox = new QCheckBox("Auto", this);
+    m_textBrowser = new QTextBrowser(this);
 
     m_timer = new QTimer(this);
     m_timer->setInterval(1'000);
@@ -32,16 +33,19 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
     m_requestTimeoutLabel->setText("Request#2:");
     m_responseLabel->setText("Response:");
 
-    m_labelTime->setAlignment(Qt::AlignCenter);
-    m_gridLayout->addWidget(m_requestLabel, 1, 1);
-    m_gridLayout->addWidget(m_requestLineEdit, 1, 2);
-    m_gridLayout->addWidget(m_button, 1, 3);
-    m_gridLayout->addWidget(m_requestTimeoutLabel, 2, 1);
-    m_gridLayout->addWidget(m_requestTimeoutLineEdit, 2, 2);
-    m_gridLayout->addWidget(m_labelTime, 2, 3);
-    m_gridLayout->addWidget(m_responseLabel, 3, 1);
-    m_gridLayout->addWidget(m_responseLineEdit, 3, 2);
-    m_gridLayout->setAlignment(Qt::AlignCenter);
+    m_gridLayout->addWidget(m_checkBox, 1, 1);
+    m_gridLayout->addWidget(m_labelTime, 1, 2);
+
+    m_gridLayout->addWidget(m_requestLabel, 2, 1);
+    m_gridLayout->addWidget(m_requestLineEdit, 2, 2);
+
+    m_gridLayout->addWidget(m_requestTimeoutLabel, 3, 1);
+    m_gridLayout->addWidget(m_requestTimeoutLineEdit, 3, 2);
+
+    m_gridLayout->addWidget(m_responseLabel, 4, 1);
+    m_gridLayout->addWidget(m_responseLineEdit, 4, 2);
+    m_gridLayout->addWidget(m_textBrowser, 5, 1, 1, 2);
+    // m_gridLayout->setAlignment(Qt::AlignCenter);
 
     connect(m_requestLineEdit, &QLineEdit::editingFinished, this, [&](){
         m_request = QString(m_requestLineEdit->text());
@@ -50,7 +54,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
         m_requestTimeout = QString(m_requestTimeoutLineEdit->text());
     });
 
-    connect(m_process, &QProcess::readyReadStandardOutput, this, [=](){
+    connect(m_process, &QProcess::readyReadStandardOutput, this, [&](){
         QByteArray ba = m_process->readAllStandardOutput();
         ba = ba.simplified();
         ba = ba.trimmed();
@@ -58,12 +62,15 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
         if (isResponse)
         {
             m_time.setHMS(0, 0, 0);
+
         }
+        m_textBrowser->append(QString(ba));
     });
     connect(m_process, &QProcess::readyReadStandardError, this, [&](){
         QByteArray ba = m_process->readAllStandardError();
         ba = ba.simplified();
         ba = ba.trimmed();
+        m_textBrowser->append(QString(ba));
     });
 
     connect(m_timer, &QTimer::timeout, this, [&](){
@@ -77,6 +84,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
                 if (requestList.size())
                 {
                     QStringList argList = QStringList(requestList.begin() + 1, requestList.end());
+                    qInfo() << requestList.first() << argList;
                     m_processTimeout->start(requestList.first(), argList);
                 }
             }
@@ -93,22 +101,25 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
         }
     });
 
-    connect(m_button, &QPushButton::clicked, this, [&](){
-        if (m_timer->isActive()) {
+    connect(m_checkBox, &QCheckBox::stateChanged, this, [&](int state){
+        switch (state) {
+        case 0:
             m_timer->stop();
             m_requestLineEdit->setDisabled(false);
             m_requestTimeoutLineEdit->setDisabled(false);
             m_responseLineEdit->setDisabled(false);
-            m_button->setText("Start");
             m_time.setHMS(0, 0, 0);
             m_labelTime->setText(m_time.toString("mm:ss"));
-            return;
+            break;
+        case 1:
+            break;
+        case 2:
+            m_timer->start();
+            m_requestLineEdit->setDisabled(true);
+            m_requestTimeoutLineEdit->setDisabled(true);
+            m_responseLineEdit->setDisabled(true);
+            break;
         }
-        m_timer->start();
-        m_requestLineEdit->setDisabled(true);
-        m_requestTimeoutLineEdit->setDisabled(true);
-        m_responseLineEdit->setDisabled(true);
-        m_button->setText("Stop");
     });
 
 }

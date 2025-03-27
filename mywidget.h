@@ -2,18 +2,16 @@
 #define MYWIDGET_H
 
 #include <QWidget>
-#include <QObject>
 #include <QLineEdit>
 #include <QGridLayout>
 #include <QLabel>
 #include <QProcess>
-#include <QPainter>
-#include <QPropertyAnimation>
-#include <QPushButton>
+#include <QCheckBox>
 
 #include <QTimer>
 #include <QTime>
 #include <QObject>
+#include <QTextBrowser>
 
 class MyWidget : public QWidget
 {
@@ -51,10 +49,11 @@ private:
     QProcess *m_processTimeout;
 
     QTimer *m_timer;
-    QPushButton *m_button;
+    QCheckBox *m_checkBox;
 
     QLabel *m_labelTime;
     QTime m_time;
+    QTextBrowser *m_textBrowser;
 
 
 };

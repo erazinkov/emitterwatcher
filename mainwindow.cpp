@@ -38,7 +38,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::writeSettings()
 {
     QSettings settings("Diamant LTD", "Emitter Watcher");
-    settings.beginGroup("MainWindow");
+    settings.beginGroup("EmitterWatcher");
     auto request = m_myWidget->request();
     settings.setValue("request", request);
     auto requestTimeout = m_myWidget->requestTimeout();
@@ -51,7 +51,7 @@ void MainWindow::writeSettings()
 void MainWindow::readSettings()
 {
     QSettings settings("Diamant LTD", "Emitter Watcher");
-    settings.beginGroup("MainWindow");
+    settings.beginGroup("EmitterWatcher");
     auto request = settings.value("request").toString();
     m_myWidget->setRequest(request);
     auto requestTimeout = settings.value("requestTimeout").toString();
