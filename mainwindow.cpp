@@ -16,8 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
     widget->setLayout(layout);
     setCentralWidget(widget);
 
-    m_ipWidget = new IPWidget(this);
-    layout->addWidget(m_ipWidget);
+    m_myWidget = new MyWidget(this);
+    layout->addWidget(m_myWidget);
 
     readSettings();
 }
@@ -37,8 +37,8 @@ void MainWindow::writeSettings()
 {
     QSettings settings("Diamant LTD", "Emitter Watcher");
     settings.beginGroup("MainWindow");
-    auto ip = m_ipWidget->ip();
-    settings.setValue("ip", m_ipWidget->ip());
+    auto request = m_myWidget->request();
+    settings.setValue("request", request);
     settings.endGroup();
 }
 
@@ -46,7 +46,7 @@ void MainWindow::readSettings()
 {
     QSettings settings("Diamant LTD", "Emitter Watcher");
     settings.beginGroup("MainWindow");
-    auto ip = settings.value("ip").toString();
-    m_ipWidget->setIp(settings.value("ip").toString());
+    auto request = settings.value("request").toString();
+    m_myWidget->setRequest(request);
     settings.endGroup();
 }

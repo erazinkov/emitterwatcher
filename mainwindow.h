@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 
-#include "ipwidget.h"
+#include "mywidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,7 +24,7 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    IPWidget *m_ipWidget;
+    MyWidget *m_myWidget;
     QLineEdit *m_lineEdit;
 
     void writeSettings();
