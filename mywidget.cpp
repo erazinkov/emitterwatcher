@@ -1,11 +1,7 @@
 #include "mywidget.h"
 
 #include <QRegularExpressionValidator>
-#include <QPropertyAnimation>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 
-#include <QDebug>
 
 MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
 {
@@ -68,7 +64,6 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
         QByteArray ba = m_process->readAllStandardError();
         ba = ba.simplified();
         ba = ba.trimmed();
-        qInfo() << ba;
     });
 
     connect(m_timer, &QTimer::timeout, this, [&](){
